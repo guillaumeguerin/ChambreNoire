@@ -22,4 +22,8 @@ app.on('ready', () => {
 	http.listen(3000, function(){
 	  console.log('listening on *:3000');
 	});
+	express.set('view engine', 'html');
+	express.get('/', function (req, res) {
+	  res.render('index', {});
+	});
 });

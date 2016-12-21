@@ -25,7 +25,7 @@ canvas {
 <!-- W2ui -->
 <script src="js/w2ui-1.5.rc1.min.js"></script>
 <!-- Socket io -->
-<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
 
 <!-- Insert this line after script imports -->
 <script>if (window.module) module = window.module;</script>
@@ -119,7 +119,7 @@ $( window ).resize(function() {
 </script>
 
 <script>
-  var socket = io();
+  var socket = io.connect('http://localhost:3000');
 </script>
 
 </body>
