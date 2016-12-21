@@ -1,0 +1,8 @@
+{
+  "name": "Chambre Noire",
+  "version": "1.0.1",
+  "main": "main.js",
+  "dependencies": {
+    "socket.io": "^1.7.2"
+  }
+}
