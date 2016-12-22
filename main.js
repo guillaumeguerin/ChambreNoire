@@ -2,6 +2,7 @@ const {app, BrowserWindow} = require('electron');
 const express = require('express')();
 const http = require('http').Server(express);
 const io = require('socket.io')(http);
+const fs = require('fs');
 
 let mainWindow;
 
@@ -26,4 +27,10 @@ app.on('ready', () => {
 	express.get('/', function (req, res) {
 	  res.render('index', {});
 	});
+	
+	fs.readdir('.', (err, files) => {
+	  files.forEach(file => {
+		console.log(file);
+	  });
+	})
 });

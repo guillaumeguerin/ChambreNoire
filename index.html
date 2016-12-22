@@ -33,6 +33,9 @@ canvas {
 <div id="layout" style="width: 100%; height: 400px;"></div>
 
 <script>
+var elements = [];
+var selectedElement;
+
 // widget configuration
 var config = {
 	layout: {
@@ -40,7 +43,20 @@ var config = {
 		panels: [
 			{ type: 'top',  size: 30, resizable: false, content: 'top', id: 'toolbar' },
 			{ type: 'left', size: 200, resizable: true, content: 'left' },
-			{ type: 'main', content: 'main' },
+			{ type: 'main', content: 'main',
+			    toolbar: {
+                    items: [
+                        { type: 'menu',   id: 'item2', caption: 'Views', img: 'icon-folder', items: [
+                            { text: '2D', icon: 'icon-page' }, 
+                            { text: '360 degrees', icon: 'icon-page' }, 
+                            { text: '3D Stereoscopic', value: 'Item Three', icon: 'icon-page' }
+                        ]}
+                    ],
+                    onClick: function (event) {
+                        this.owner.content('main', event);
+                    }
+				}
+			},
 			{ type: 'preview', size: '50%', resizable: true, content: 'preview' },
 			{ type: 'right', size: 200, resizable: true, content: 'right' },
 			{ type: 'bottom', size: 50, resizable: true, content: 'bottom' }
@@ -57,7 +73,7 @@ var config = {
             { type: 'radio', id: 'item5', group: '1', text: 'Camera Tool', icon: 'fa fa-video-camera' },
             { type: 'radio', id: 'item6', group: '1', text: 'Pan Behind Tool', icon: 'fa fa-arrows-alt' },
             { type: 'spacer' },
-            { type: 'radio', id: 'item7', group: '1', text: 'Button', icon: 'fa fa-text-width' }
+            { type: 'radio', id: 'item7', group: '1', text: 'Text', icon: 'fa fa-text-width' }
         ],
         onClick: function (event) {
             console.log('Target: '+ event.target, event);
@@ -67,39 +83,18 @@ var config = {
 		name: 'sidebar',
 		img: null,
 		nodes: [ 
-			{ id: 'level-1', text: 'Level 1', img: 'icon-folder', expanded: true, group: true,
-			  nodes: [ { id: 'level-1-1', text: 'Level 1.1', icon: 'fa fa-home' },
-					   { id: 'level-1-2', text: 'Level 1.2', icon: 'fa fa-star' },
-					   { id: 'level-1-3', text: 'Level 1.3', icon: 'fa fa-check' }
-					 ]
-			},
-			{ id: 'level-2', text: 'Level 2', img: 'icon-folder', expanded: true, group: true,
-			  nodes: [ { id: 'level-2-1', text: 'Level 2.1', img: 'icon-folder', 
-						 nodes: [
-						   { id: 'level-2-1-1', text: 'Level 2.1.1', img: 'icon-page' },
-						   { id: 'level-2-1-2', text: 'Level 2.1.2', img: 'icon-page' },
-						   { id: 'level-2-1-3', text: 'Level 2.1.3', img: 'icon-page' }
-					 ]},
-					   { id: 'level-2-2', text: 'Level 2.2', img: 'icon-page' },
-					   { id: 'level-2-3', text: 'Level 2.3', img: 'icon-page' }
-					 ]
-			},
-			{ id: 'level-3', text: 'Level 3', img: 'icon-folder', expanded: true, group: true,
-			  nodes: [ { id: 'level-3-1', text: 'Level 3.1', img: 'icon-page' },
-					   { id: 'level-3-2', text: 'Level 3.2', img: 'icon-page' },
-					   { id: 'level-3-3', text: 'Level 3.3', img: 'icon-page' }
-					 ]
+			{ id: 'level-1', text: 'Composition', img: 'icon-folder', expanded: true, group: true,
 			}
 		],
 		onClick: function (event) {
-			w2ui['layout'].content('main', 'id: ' + event.target);
+			findElement(event.target).updateViews();
 		}
 	},
 	tabs : {
         name: 'tabs',
         tabs: [
-            { id: 'tab1', text: 'Effects' },
-            { id: 'tab2', text: 'Tab 2 Text' },
+			{ id: 'tab1', text: 'Properties' },
+            { id: 'tab2', text: 'Effects' }
         ]
 	}
 };
@@ -112,10 +107,75 @@ w2ui.layout.content('main', '<canvas id="myCanvas" width="100%" height="100%" st
 
 
 $('#layout').height($( window ).height() - 15);
-
 $( window ).resize(function() {
   $('#layout').height($( window ).height() - 20);
 });
+
+
+var Scene = function(id, name, duration, width, height) {
+  this.id = id;
+  this.name = name;
+  this.duration = duration;
+  this.width = width;
+  this.height = height;
+  w2ui.sidebar.add([
+	{ id: id, text: name, img: 'icon-page' },
+  ]);
+  console.log('Scene instantiated');
+};
+
+Scene.prototype.getId = function() {
+	return this.id;
+}
+Scene.prototype.setId = function(i) {
+	this.id = i;
+}
+Scene.prototype.getName = function() {
+	return this.name;
+}
+Scene.prototype.setName = function(n) {
+	this.name = n;
+}
+Scene.prototype.getDuration = function() {
+	return this.duration;
+}
+Scene.prototype.setDuration = function(d) {
+	this.duration = d;
+}
+Scene.prototype.getWidth = function() {
+	return this.width;
+}
+Scene.prototype.setWidth = function(w) {
+	this.width = w;
+}
+Scene.prototype.getHeight = function() {
+	return this.height;
+}
+Scene.prototype.setHeight = function(h) {
+	this.height = w;
+}
+
+Scene.prototype.drawCanvas = function() {
+	canvas = '<canvas id="myCanvas" width="'+this.width+'" height="'+this.height+'" style="border:1px solid #000000;"></canvas>';
+	w2ui['layout'].content('main', canvas);
+}
+
+Scene.prototype.updateViews = function() {
+	this.drawCanvas();
+}
+
+var scene1 = new Scene('scene1', 'Scene 1', 30, 1920, 1080);
+elements.push(scene1);
+
+function findElement(id) {
+	for(i=0; i<elements.length; i++) {
+		if(elements[i].getId() == id) {
+			selectedElement = elements[i];
+			return elements[i];
+		}
+	}
+	return null;
+}
 </script>
 
 <script>
